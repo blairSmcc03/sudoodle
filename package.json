@@ -11,7 +11,8 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "puzzles": "tsx scripts/fetch-puzzles.ts",
-    "tokens": "tsx scripts/make-tokens.ts"
+    "tokens": "tsx scripts/make-tokens.ts",
+    "sample": "tsx scripts/make-sample.ts"
   },
   "dependencies": {
     "preact": "^11.2.0"
