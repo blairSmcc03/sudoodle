@@ -3,10 +3,10 @@ import { completedUnits, corgiPose } from "./corgi";
 import { enterDigit, newGame, type GameState } from "./game";
 import { PUZZLE, SOLUTION } from "./fixtures";
 
-// Row 0 of PUZZLE is "530070000": cells 2, 4..8 are empty. Fill all but one, then the last.
+// Row 0 of PUZZLE is "530070000": cells 2, 3, 5, 6, 7, 8 are empty. Fill all but one.
 function fillRowZeroExcept(skip: number): GameState {
   let state = newGame(PUZZLE, SOLUTION);
-  for (const cell of [2, 4, 5, 6, 7, 8]) {
+  for (const cell of [2, 3, 5, 6, 7, 8]) {
     if (cell !== skip) state = enterDigit(state, cell, Number(SOLUTION[cell]));
   }
   return state;
