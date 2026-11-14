@@ -1,0 +1,13 @@
+name = "sudoodle-api"
+main = "worker/index.ts"
+compatibility_date = "2026-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sudoodle"
+database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"
+migrations_dir = "worker/migrations"
+
+# Secrets (never committed):
+#   npx wrangler secret put TOKEN_HER
+#   npx wrangler secret put TOKEN_HIM
