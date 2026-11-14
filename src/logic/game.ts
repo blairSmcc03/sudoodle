@@ -2,10 +2,17 @@ import { parseGrid, isCorrect, peersOf, type Grid } from "./grid";
 
 export type GameEvent = { type: "mistake" } | { type: "heartsDepleted" };
 
+interface Snapshot {
+  values: number[];
+  notes: number[];
+}
+
 export interface GameState {
   grid: Grid;
   /** Per-cell pencil marks as a bitmask: bit d set means digit d is noted. */
   notes: number[];
+  /** Board snapshots taken before each undoable action, most recent last. */
+  history: Snapshot[];
   hearts: number;
   /** Total hearts lost over the whole game, including ones given back. */
   livesLost: number;
@@ -18,7 +25,7 @@ export const STARTING_HEARTS = 3;
 export const DEPLETION_PENALTY_SECONDS = 30;
 
 export function newGame(puzzle: string, solution: string): GameState {
-  return { grid: parseGrid(puzzle, solution), notes: new Array<number>(81).fill(0), hearts: STARTING_HEARTS, livesLost: 0, penaltySeconds: 0 };
+  return { grid: parseGrid(puzzle, solution), notes: new Array<number>(81).fill(0), history: [], hearts: STARTING_HEARTS, livesLost: 0, penaltySeconds: 0 };
 }
 
 export function enterDigit(state: GameState, index: number, digit: number): GameState {
@@ -41,7 +48,24 @@ export function enterDigit(state: GameState, index: number, digit: number): Game
   const notes = [...state.notes];
   notes[index] = 0;
   for (const peer of peersOf(index)) notes[peer] = (notes[peer] ?? 0) & ~(1 << digit);
-  return { ...state, grid: { ...state.grid, values }, notes, event: undefined };
+  return { ...state, grid: { ...state.grid, values }, notes, history: pushHistory(state), event: undefined };
+}
+
+function pushHistory(state: GameState): Snapshot[] {
+  return [...state.history, { values: state.grid.values, notes: state.notes }];
+}
+
+/** Takes back the last board change. Hearts, lives lost and penalties are never restored. */
+export function undo(state: GameState): GameState {
+  const previous = state.history[state.history.length - 1];
+  if (!previous) return state;
+  return {
+    ...state,
+    grid: { ...state.grid, values: previous.values },
+    notes: previous.notes,
+    history: state.history.slice(0, -1),
+    event: undefined,
+  };
 }
 
 /** The digits noted in a cell, ascending. */
@@ -56,7 +80,7 @@ export function toggleNote(state: GameState, index: number, digit: number): Game
   if (state.grid.values[index] !== 0) return state;
   const notes = [...state.notes];
   notes[index] = (notes[index] ?? 0) ^ (1 << digit);
-  return { ...state, notes, event: undefined };
+  return { ...state, notes, history: pushHistory(state), event: undefined };
 }
 
 /** Clears the notes and any player-placed digit in a cell. Givens are never cleared. */
@@ -66,5 +90,5 @@ export function eraseCell(state: GameState, index: number): GameState {
   values[index] = 0;
   const notes = [...state.notes];
   notes[index] = 0;
-  return { ...state, grid: { ...state.grid, values }, notes, event: undefined };
+  return { ...state, grid: { ...state.grid, values }, notes, history: pushHistory(state), event: undefined };
 }
