@@ -95,20 +95,20 @@ describe("notes", () => {
   });
 
   test("placing a digit removes it from the notes of its row, column and box", () => {
-    // 4 goes at cell 2. Peers: 3 (row), 20 (box), 38 (column 2, row 4).
+    // 4 goes at cell 2. Empty peers: 3 (same row), 10 (same box), 38 (same column).
     let state = newGame(PUZZLE, SOLUTION);
-    for (const cell of [3, 20, 38]) state = toggleNote(toggleNote(state, cell, 4), cell, 9);
+    for (const cell of [3, 10, 38]) state = toggleNote(toggleNote(state, cell, 4), cell, 9);
     state = enterDigit(state, 2, 4);
     expect(notesAt(state, 3)).toEqual([9]);
-    expect(notesAt(state, 20)).toEqual([9]);
+    expect(notesAt(state, 10)).toEqual([9]);
     expect(notesAt(state, 38)).toEqual([9]);
   });
 
   test("notes elsewhere on the board are untouched", () => {
-    // cell 41 (row 4, col 5) shares no row, column or box with cell 2
-    let state = toggleNote(newGame(PUZZLE, SOLUTION), 41, 4);
+    // cell 40 (row 4, col 4) shares no row, column or box with cell 2
+    let state = toggleNote(newGame(PUZZLE, SOLUTION), 40, 4);
     state = enterDigit(state, 2, 4);
-    expect(notesAt(state, 41)).toEqual([4]);
+    expect(notesAt(state, 40)).toEqual([4]);
   });
 
   test("a mistake leaves notes alone", () => {
