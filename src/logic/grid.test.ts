@@ -1,5 +1,14 @@
 import { describe, expect, test } from "vitest";
-import { findConflicts, parseGrid, peersOf, type Grid } from "./grid";
+import {
+  cellsWithDigit,
+  digitCounts,
+  findConflicts,
+  isComplete,
+  isCorrect,
+  parseGrid,
+  peersOf,
+  type Grid,
+} from "./grid";
 import { PUZZLE, SOLUTION } from "./fixtures";
 
 describe("parseGrid", () => {
@@ -80,5 +89,61 @@ describe("findConflicts", () => {
     // cell 2 should be 4; 1 appears nowhere in row 0, column 2 or box 0
     const grid = withValue(parseGrid(PUZZLE, SOLUTION), 2, 1);
     expect(findConflicts(grid)).toEqual([]);
+  });
+});
+
+describe("isCorrect", () => {
+  const grid = parseGrid(PUZZLE, SOLUTION);
+
+  test("accepts the solution digit for a cell", () => {
+    expect(isCorrect(grid, 2, 4)).toBe(true);
+  });
+
+  test("rejects a digit that contradicts the solution", () => {
+    expect(isCorrect(grid, 2, 1)).toBe(false);
+  });
+
+  test("rejects a digit that also conflicts with a peer", () => {
+    expect(isCorrect(grid, 2, 5)).toBe(false);
+  });
+});
+
+describe("isComplete", () => {
+  test("is false while cells are empty", () => {
+    expect(isComplete(parseGrid(PUZZLE, SOLUTION))).toBe(false);
+  });
+
+  test("is true when every cell holds the solution digit", () => {
+    expect(isComplete(parseGrid(SOLUTION, SOLUTION))).toBe(true);
+  });
+
+  test("is false when one cell holds a wrong digit", () => {
+    expect(isComplete(withValue(parseGrid(SOLUTION, SOLUTION), 0, 1))).toBe(false);
+  });
+});
+
+describe("digitCounts", () => {
+  test("counts how many of each digit are placed", () => {
+    const counts = digitCounts(parseGrid(PUZZLE, SOLUTION));
+    expect(counts[1]).toBe(3);
+    expect(counts[2]).toBe(2);
+    expect(counts[6]).toBe(5);
+    expect(counts[9]).toBe(4);
+  });
+
+  test("a fully solved grid has nine of every digit", () => {
+    const counts = digitCounts(parseGrid(SOLUTION, SOLUTION));
+    for (let d = 1; d <= 9; d++) expect(counts[d]).toBe(9);
+  });
+});
+
+describe("cellsWithDigit", () => {
+  test("lists every cell holding the digit", () => {
+    expect(cellsWithDigit(parseGrid(PUZZLE, SOLUTION), 5)).toEqual([0, 14, 71]);
+  });
+
+  test("includes cells filled in by the player", () => {
+    const grid = withValue(parseGrid(PUZZLE, SOLUTION), 2, 4);
+    expect(cellsWithDigit(grid, 4)).toEqual([2, 36, 66]);
   });
 });

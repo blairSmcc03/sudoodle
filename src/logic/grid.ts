@@ -57,3 +57,30 @@ export function findConflicts(grid: Grid): number[] {
   });
   return conflicts;
 }
+
+/** True if `digit` is the solution digit for cell `index`. */
+export function isCorrect(grid: Grid, index: number, digit: number): boolean {
+  return grid.solution[index] === digit;
+}
+
+/** True when every cell holds its solution digit. */
+export function isComplete(grid: Grid): boolean {
+  return grid.values.every((v, i) => v === grid.solution[i]);
+}
+
+/** Index 1-9: how many of each digit are currently on the board. Index 0 is unused. */
+export function digitCounts(grid: Grid): number[] {
+  const counts = new Array<number>(10).fill(0);
+  for (const v of grid.values) counts[v] = (counts[v] ?? 0) + 1;
+  counts[0] = 0;
+  return counts;
+}
+
+/** Indices (ascending) of every cell holding `digit`. */
+export function cellsWithDigit(grid: Grid, digit: number): number[] {
+  const cells: number[] = [];
+  grid.values.forEach((v, i) => {
+    if (v === digit) cells.push(i);
+  });
+  return cells;
+}
