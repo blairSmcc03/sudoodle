@@ -30,3 +30,19 @@ export function parseGrid(puzzle: string, solution: string): Grid {
   });
   return { values, givens: values.map((v) => v !== 0), solution: solved };
 }
+
+/** The 20 cells sharing a row, column or box with `index` (excluding itself). */
+export function peersOf(index: number): number[] {
+  const row = Math.floor(index / 9);
+  const col = index % 9;
+  const boxRow = Math.floor(row / 3) * 3;
+  const boxCol = Math.floor(col / 3) * 3;
+  const peers = new Set<number>();
+  for (let i = 0; i < 9; i++) {
+    peers.add(row * 9 + i);
+    peers.add(i * 9 + col);
+    peers.add((boxRow + Math.floor(i / 3)) * 9 + boxCol + (i % 3));
+  }
+  peers.delete(index);
+  return [...peers];
+}
