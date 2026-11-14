@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Placeholder corgi (celebrate). Replace this file with real art; keep the filename. -->
+  <ellipse cx="100" cy="188" rx="52" ry="7" fill="#000" opacity=".07"/>
+  <g transform="rotate(-22 150 160)"><ellipse cx="152" cy="158" rx="12" ry="9" fill="#f6b26b"/></g>
+  <ellipse cx="100" cy="150" rx="46" ry="34" fill="#f6b26b"/>
+  <ellipse cx="100" cy="158" rx="28" ry="24" fill="#fff6ea"/>
+  <ellipse cx="54" cy="136" rx="10" ry="16" fill="#f6b26b" transform="rotate(-30 54 136)"/><ellipse cx="146" cy="136" rx="10" ry="16" fill="#f6b26b" transform="rotate(30 146 136)"/>
+  <path d="M52 50 L58 20 L88 42 Z" fill="#f6b26b" stroke="#e39a4e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M148 50 L142 20 L112 42 Z" fill="#f6b26b" stroke="#e39a4e" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M60 42 L62 28 L78 42 Z" fill="#ffc9d6"/>
+  <path d="M140 42 L138 28 L122 42 Z" fill="#ffc9d6"/>
+  <ellipse cx="100" cy="98" rx="52" ry="44" fill="#f6b26b"/>
+  <path d="M100 56 C84 62 78 84 86 110 C92 126 108 126 114 110 C122 84 116 62 100 56Z" fill="#fff6ea"/>
+  <path d="M74 94 Q82 84 90 94" stroke="#4a3535" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M110 94 Q118 84 126 94" stroke="#4a3535" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <ellipse cx="100" cy="104" rx="8" ry="6" fill="#4a3535"/>
+  <path d="M84 108 Q100 136 116 108 Z" fill="#ff8fa8" stroke="#4a3535" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="68" cy="108" r="7" fill="#ff9ec4" opacity=".55"/>
+  <circle cx="132" cy="108" r="7" fill="#ff9ec4" opacity=".55"/>
+  <text x="26" y="44" font-size="22">🎉</text><text x="150" y="44" font-size="22">✨</text><text x="150" y="150" font-size="18">💗</text>
+</svg>

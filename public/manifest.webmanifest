@@ -1,0 +1,10 @@
+{
+  "name": "Sudoodle",
+  "short_name": "Sudoodle",
+  "description": "A cute daily sudoku",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff5f8",
+  "theme_color": "#ffe4ee",
+  "icons": [{ "src": "/corgi/corgi-idle.svg", "sizes": "any", "type": "image/svg+xml" }]
+}

@@ -12,12 +12,14 @@
     "typecheck": "tsc --noEmit",
     "puzzles": "tsx scripts/fetch-puzzles.ts",
     "tokens": "tsx scripts/make-tokens.ts",
-    "sample": "tsx scripts/make-sample.ts"
+    "sample": "tsx scripts/make-sample.ts",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "preact": "^11.2.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@preact/preset-vite": "^2.10.6",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/preact": "^3.2.6",
