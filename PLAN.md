@@ -1,6 +1,6 @@
 # Sudoodle: PLAN
 
-> Status: **design tree complete, awaiting confirmation to start the build.** Updated after each round of decisions.
+> Status: **built.** All 12 slices are implemented test-first. Remaining work is the one-time setup in `README.md` (API key, Cloudflare, real corgi art). Updated after each round of decisions.
 > Development follows TDD (red → green → refactor, one vertical slice at a time).
 
 ## Goal
@@ -79,7 +79,27 @@ A cute, mobile-first daily sudoku web page for one person (my girlfriend), opene
 - After finishing, the results screen shows a countdown to the next puzzle.
 
 ## Open questions
-None. Next step: Blair confirms, then the TDD build starts with slice 1.
+None.
+
+## Build notes (what was decided during the build)
+- **Seams tested** (agreed for slice 1, extended on the same principle: public functions, no internals):
+  `parseGrid`, `peersOf`, `findConflicts`, `isCorrect`, `isComplete`, `digitCounts`, `cellsWithDigit`;
+  `londonDateKey`, `puzzleForDate`, `buildDifficultySchedule`; `newGame`, `enterDigit`, `toggleNote`,
+  `eraseCell`, `undo`, `isWon`; `msUntilNextLondonMidnight`, `formatCountdown`; the timer functions;
+  `recordFinish`, `currentStreak`; session / streak persistence; `boardFor`, `tally`; the Worker's
+  `handleRequest` (auth, spoilers, tally, streak) and `d1ResultStore` (run against real SQLite);
+  the offline queue; the HTTP client; `shareText`; `completedUnits`, `corgiPose`; setup-link pairing;
+  the batch builder and API client; the `App` through the DOM; iPhone-viewport layout.
+- **Mistakes** place nothing on the board: the wrong digit is rejected, so it is never "removed".
+- **Streak** is computed by the Worker from stored results (so it survives clearing the browser) and
+  mirrored locally for unpaired devices.
+- **First result wins** on the server, so a retry can't be used to improve a time.
+- **Tally** counts wins by day, and a draw counts for nobody.
+- **Real WebKit** won't launch on this dev machine (missing OS libraries), so the e2e tests use Chromium
+  with iPhone viewports. Do a manual check on a real iPhone before relying on Safari-specific behaviour
+  (safe areas, `100dvh`, the share sheet).
+- **`public/puzzles.dev.json`** is a dev-only sample (gitignored); production reads `public/puzzles.json`.
+- I could not view screenshots, so the visual design was checked by measurement, not by eye.
 
 ## Architecture (draft)
 - **Static site**: Vite + TypeScript + Preact. Today's puzzle comes from `puzzles.json`, chosen by the Europe/London date.
