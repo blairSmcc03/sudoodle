@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { parseGrid, peersOf } from "./grid";
+import { findConflicts, parseGrid, peersOf, type Grid } from "./grid";
 import { PUZZLE, SOLUTION } from "./fixtures";
 
 describe("parseGrid", () => {
@@ -43,5 +43,42 @@ describe("peersOf", () => {
     expect([...peersOf(40)].sort((a, b) => a - b)).toEqual([
       4, 13, 22, 30, 31, 32, 36, 37, 38, 39, 41, 42, 43, 44, 48, 49, 50, 58, 67, 76,
     ]);
+  });
+});
+
+function withValue(grid: Grid, index: number, digit: number): Grid {
+  const values = [...grid.values];
+  values[index] = digit;
+  return { ...grid, values };
+}
+
+describe("findConflicts", () => {
+  test("a fresh puzzle has no conflicts", () => {
+    expect(findConflicts(parseGrid(PUZZLE, SOLUTION))).toEqual([]);
+  });
+
+  test("a digit repeated in a row flags both cells", () => {
+    // cell 2 is empty; row 0 already has a 5 at cell 0
+    const grid = withValue(parseGrid(PUZZLE, SOLUTION), 2, 5);
+    expect(findConflicts(grid)).toEqual([0, 2]);
+  });
+
+  test("a digit repeated in a column flags both cells", () => {
+    // cell 18 (row 2, col 0) is empty; column 0 has a 5 at cell 0
+    const grid = withValue(parseGrid(PUZZLE, SOLUTION), 18, 5);
+    expect(findConflicts(grid)).toEqual([0, 18]);
+  });
+
+  test("a digit repeated in a box flags both cells", () => {
+    // cell 2 is empty; the only 9 among its peers is the given at cell 19 (same box,
+    // different row and column); row 0 and column 2 contain no 9.
+    const grid = withValue(parseGrid(PUZZLE, SOLUTION), 2, 9);
+    expect(findConflicts(grid)).toEqual([2, 19]);
+  });
+
+  test("a wrong digit that conflicts with nothing is not a conflict", () => {
+    // cell 2 should be 4; 1 appears nowhere in row 0, column 2 or box 0
+    const grid = withValue(parseGrid(PUZZLE, SOLUTION), 2, 1);
+    expect(findConflicts(grid)).toEqual([]);
   });
 });

@@ -46,3 +46,14 @@ export function peersOf(index: number): number[] {
   peers.delete(index);
   return [...peers];
 }
+
+/** Indices (ascending) of filled cells whose digit also appears in one of their peers. */
+export function findConflicts(grid: Grid): number[] {
+  const conflicts: number[] = [];
+  grid.values.forEach((digit, index) => {
+    if (digit !== 0 && peersOf(index).some((p) => grid.values[p] === digit)) {
+      conflicts.push(index);
+    }
+  });
+  return conflicts;
+}
