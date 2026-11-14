@@ -11,4 +11,21 @@ describe("parseGrid", () => {
     expect(grid.givens[2]).toBe(false);
     expect(grid.values).toHaveLength(81);
   });
+
+  test("rejects a puzzle that is not 81 characters", () => {
+    expect(() => parseGrid(PUZZLE.slice(1), SOLUTION)).toThrow(/81/);
+  });
+
+  test("rejects a puzzle containing a non-digit character", () => {
+    expect(() => parseGrid("x" + PUZZLE.slice(1), SOLUTION)).toThrow(/digit/i);
+  });
+
+  test("rejects a solution with an empty cell", () => {
+    expect(() => parseGrid(PUZZLE, "0" + SOLUTION.slice(1))).toThrow(/solution/i);
+  });
+
+  test("rejects a solution that contradicts a given", () => {
+    // PUZZLE starts with a given 5; this solution starts with 4 instead.
+    expect(() => parseGrid(PUZZLE, "4" + SOLUTION.slice(1))).toThrow(/given/i);
+  });
 });
