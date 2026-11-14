@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { enterDigit, eraseCell, newGame, notesAt, toggleNote, undo, type GameState } from "./game";
+import { enterDigit, eraseCell, isWon, newGame, notesAt, toggleNote, undo, type GameState } from "./game";
 import { PUZZLE, SOLUTION } from "./fixtures";
 
 // In PUZZLE, cell 2 is empty and its solution digit is 4; 1 is wrong for it.
@@ -190,5 +190,24 @@ describe("undo", () => {
     state = undo(state);
     expect(state.penaltySeconds).toBe(30);
     expect(state.hearts).toBe(1);
+  });
+});
+
+describe("winning", () => {
+  test("a fresh game is not won", () => {
+    expect(isWon(newGame(PUZZLE, SOLUTION))).toBe(false);
+  });
+
+  test("filling the last correct digit wins the game", () => {
+    // A solution with only cell 2 blank; the answer is 4.
+    const almost = SOLUTION.slice(0, 2) + "0" + SOLUTION.slice(3);
+    const state = enterDigit(newGame(almost, SOLUTION), 2, 4);
+    expect(isWon(state)).toBe(true);
+  });
+
+  test("undoing the last digit un-wins the game", () => {
+    const almost = SOLUTION.slice(0, 2) + "0" + SOLUTION.slice(3);
+    const won = enterDigit(newGame(almost, SOLUTION), 2, 4);
+    expect(isWon(undo(won))).toBe(false);
   });
 });

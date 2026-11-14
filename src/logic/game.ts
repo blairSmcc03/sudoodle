@@ -1,4 +1,4 @@
-import { parseGrid, isCorrect, peersOf, type Grid } from "./grid";
+import { isComplete, isCorrect, parseGrid, peersOf, type Grid } from "./grid";
 
 export type GameEvent = { type: "mistake" } | { type: "heartsDepleted" };
 
@@ -91,4 +91,8 @@ export function eraseCell(state: GameState, index: number): GameState {
   const notes = [...state.notes];
   notes[index] = 0;
   return { ...state, grid: { ...state.grid, values }, notes, history: pushHistory(state), event: undefined };
+}
+
+export function isWon(state: GameState): boolean {
+  return isComplete(state.grid);
 }
