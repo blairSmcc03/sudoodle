@@ -1,7 +1,7 @@
 {
   "names": { "her": "user", "him": "Blair" },
-  "apiUrl": "",
-  "siteUrl": "",
+  "apiUrl": "https://sudoodle.blair030703.workers.dev/",
+  "siteUrl": "https://sudoodle.pages.dev",
   "completionMessages": [
     "You did it! 🐾",
     "Another one in the bag 💗",
