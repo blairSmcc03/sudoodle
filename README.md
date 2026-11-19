@@ -36,12 +36,17 @@ need the extension changed in `src/components/Corgi.tsx`).
    npx wrangler login                              # opens a browser to sign in to Cloudflare
    npx wrangler d1 create sudoodle                 # prints a database_id: paste it into wrangler.toml
    npx wrangler d1 migrations apply sudoodle --remote
-   npm run tokens -- https://your-site.pages.dev   # prints two tokens and two setup links
+   npm run tokens -- https://sudoodle.pages.dev    # your Pages URL (see below); prints tokens and setup links
    npx wrangler secret put TOKEN_HER               # paste her token when prompted
    npx wrangler secret put TOKEN_HIM               # paste his token when prompted
    npx wrangler deploy                             # prints the Worker URL
    ```
    Put the Worker URL in `config.json` as `apiUrl` (and your site URL as `siteUrl`).
+
+   **Your site URL** is `https://<project-name>.pages.dev`, where the project name is the one you choose
+   when creating the Pages project in step 3 (e.g. `sudoodle`). Cloudflare gives every Pages project this
+   default domain; if the name is taken it adds a suffix, so check the **Domains** section of the project
+   after the first deploy and use that exact address here.
 
    **Using the dashboard instead:** `wrangler login` is the only step that needs the terminal, and the
    dashboard can do the rest. Under **Workers & Pages → D1 SQL database**, create `sudoodle`, then open
