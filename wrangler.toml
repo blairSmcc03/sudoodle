@@ -5,7 +5,7 @@ compatibility_date = "2026-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "sudoodle"
-database_id = "REPLACE_WITH_ID_FROM_wrangler_d1_create"
+database_id = "8308cc30-3cde-4b73-a1a9-031a381bcbdf"
 migrations_dir = "worker/migrations"
 
 # Secrets (never committed):
