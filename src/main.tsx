@@ -3,6 +3,7 @@ import { App } from "./App";
 import { createHttpApi } from "./api";
 import config from "../config.json";
 import { loadToken, pairFromUrl } from "./pairing";
+import { puzzleSourceFor } from "./puzzleSource";
 import type { PuzzleBatch } from "./logic/schedule";
 import "./styles.css";
 
@@ -17,11 +18,15 @@ async function fetchBatch(url: string): Promise<PuzzleBatch | null> {
   }
 }
 
+/**
+ * Loads the real batch. In a dev build only, `?puzzles=dev` loads the throwaway sample instead
+ * (used by the e2e tests, since the real batch may not have started yet). Production builds
+ * ignore the flag, so it can't unlock anything.
+ */
 async function loadBatch(): Promise<PuzzleBatch> {
   const base = import.meta.env.BASE_URL;
-  const batch =
-    (await fetchBatch(`${base}puzzles.json`)) ??
-    (import.meta.env.DEV ? await fetchBatch(`${base}puzzles.dev.json`) : null);
+  const file = puzzleSourceFor({ dev: import.meta.env.DEV, search: window.location.search });
+  const batch = await fetchBatch(`${base}${file}`);
   if (!batch) throw new Error("Could not load puzzles");
   return batch;
 }

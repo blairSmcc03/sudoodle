@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.goto("/");
+  // The real batch starts in December, so use the dev sample (today's date) for the layout tests.
+  await page.goto("/?puzzles=dev");
   await page.getByRole("button", { name: /start/i }).click();
   await page.locator(".board").waitFor();
 });

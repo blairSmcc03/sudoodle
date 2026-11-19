@@ -6,9 +6,11 @@ export default defineConfig({
   webServer: {
     command: "npx tsx scripts/make-sample.ts && npx vite --port 5199",
     url: "http://localhost:5199",
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
   use: { baseURL: "http://localhost:5199" },
+  // Never reuse a server from a previous run: a stale one could serve the wrong puzzles.
+  // (CI always starts fresh, so this only matters locally.)
   projects: [
     { name: "iPhone SE", use: { ...devices["iPhone SE"], defaultBrowserType: "chromium" } },
     { name: "iPhone 13", use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" } },
