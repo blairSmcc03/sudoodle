@@ -3,15 +3,16 @@
  *
  *   YOUDOSUDOKU_API_KEY=... npx tsx scripts/fetch-puzzles.ts [startDate] [days]
  *
- * Defaults: start 2026-12-01, 365 days. The API key is read from the environment only.
+ * Defaults: start 2026-12-01, 365 days. The key comes from YOUDOSUDOKU_API_KEY or api.key.
  */
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { seededRandom } from "../src/logic/difficulty";
 import { buildBatch, createApiClient } from "./batch";
+import { readApiKey } from "./apiKey";
 
-const apiKey = process.env.YOUDOSUDOKU_API_KEY;
+const apiKey = readApiKey(process.env, (path) => readFileSync(path, "utf8"));
 if (!apiKey) {
-  console.error("Set YOUDOSUDOKU_API_KEY (see .env.example).");
+  console.error("No API key found. Set YOUDOSUDOKU_API_KEY or put the key in api.key (see .env.example).");
   process.exit(1);
 }
 
@@ -20,7 +21,6 @@ const days = Number(process.argv[3] ?? 365);
 
 // A fresh random seed each run; the result is saved, so it doesn't need to be reproducible.
 const seed = Math.floor(Math.random() * 2 ** 31);
-
 
 const batch = await buildBatch({
   startDate,

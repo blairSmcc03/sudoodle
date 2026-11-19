@@ -8,3 +8,5 @@ dist
 public/puzzles.dev.json
 test-results
 playwright-report
+api.key
+*.key
