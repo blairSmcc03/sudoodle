@@ -1,5 +1,5 @@
 import { parseGrid } from "../src/logic/grid";
-import { buildDifficultySchedule } from "../src/logic/difficulty";
+import { buildDifficultySchedule, buildDifficultyScheduleBefore } from "../src/logic/difficulty";
 import { daysBetween, type Difficulty, type PuzzleBatch } from "../src/logic/schedule";
 
 export type PuzzleFetcher = (difficulty: Difficulty) => Promise<{ puzzle: string; solution: string }>;
@@ -46,19 +46,50 @@ export interface BuildOptions {
 
 const realSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-export async function buildBatch({
-  startDate,
-  days,
-  random,
-  fetchPuzzle,
-  intervalMs = 1100,
-  rateLimitWaitMs = 65_000,
-  sleep = realSleep,
-}: BuildOptions): Promise<PuzzleBatch> {
+function assertDateKey(startDate: string): void {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate) || Number.isNaN(Date.parse(`${startDate}T00:00:00Z`))) {
     throw new Error(`Invalid start date "${startDate}", expected YYYY-MM-DD`);
   }
-  const schedule = buildDifficultySchedule(days, random);
+}
+
+export async function buildBatch(options: BuildOptions): Promise<PuzzleBatch> {
+  assertDateKey(options.startDate);
+  const schedule = buildDifficultySchedule(options.days, options.random);
+  return { startDate: options.startDate, puzzles: await fetchSchedule(schedule, options) };
+}
+
+type FetchOptions = Pick<BuildOptions, "fetchPuzzle" | "intervalMs" | "rateLimitWaitMs" | "sleep">;
+
+/**
+ * Adds puzzles for the days from `newStartDate` up to the batch's current start, keeping every
+ * existing puzzle (and so every existing date) exactly as it was. Returns a new batch.
+ */
+export async function prependDays(
+  batch: PuzzleBatch,
+  newStartDate: string,
+  options: FetchOptions & { random: () => number },
+): Promise<PuzzleBatch> {
+  assertDateKey(newStartDate);
+  const missing = daysBetween(newStartDate, batch.startDate);
+  if (missing <= 0) return batch;
+  const schedule = buildDifficultyScheduleBefore(
+    batch.puzzles.map((p) => p.difficulty),
+    missing,
+    options.random,
+  );
+  const added = await fetchSchedule(schedule, options);
+  return { startDate: newStartDate, puzzles: [...added, ...batch.puzzles] };
+}
+
+async function fetchSchedule(
+  schedule: Difficulty[],
+  {
+    fetchPuzzle,
+    intervalMs = 1100,
+    rateLimitWaitMs = 65_000,
+    sleep = realSleep,
+  }: FetchOptions,
+): Promise<PuzzleBatch["puzzles"]> {
   const puzzles: PuzzleBatch["puzzles"] = [];
   for (const [i, difficulty] of schedule.entries()) {
     let lastError: unknown;
@@ -85,7 +116,7 @@ export async function buildBatch({
       throw new Error(`Could not get a valid ${difficulty} puzzle for day ${i + 1}: ${String(lastError)}`);
     }
   }
-  return { startDate, puzzles };
+  return puzzles;
 }
 
 /** Days of puzzles left, counting today. 0 once the batch has run out. */

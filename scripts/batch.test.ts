@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildBatch, createApiClient, RateLimitError, remainingDays, type PuzzleFetcher } from "./batch";
+import { buildBatch, createApiClient, prependDays, RateLimitError, remainingDays, type PuzzleFetcher } from "./batch";
 import { PUZZLE, SOLUTION } from "../src/logic/fixtures";
 import { seededRandom } from "../src/logic/difficulty";
 
@@ -157,5 +157,49 @@ describe("remainingDays", () => {
 
   test("before the start date, it is the whole batch", () => {
     expect(remainingDays(batch, "2026-01-01")).toBe(365);
+  });
+});
+
+describe("prependDays", () => {
+  const existing = {
+    startDate: "2026-12-01",
+    puzzles: [
+      { difficulty: "medium" as const, puzzle: PUZZLE, solution: SOLUTION },
+      { difficulty: "hard" as const, puzzle: PUZZLE, solution: SOLUTION },
+    ],
+  };
+
+  test("fills the days from the new start date up to the old one, keeping the old puzzles after", async () => {
+    const batch = await prependDays(existing, "2026-11-20", { random: seededRandom(1), fetchPuzzle: good, ...noWait });
+    expect(batch.startDate).toBe("2026-11-20");
+    expect(batch.puzzles).toHaveLength(11 + 2);
+    expect(batch.puzzles.slice(11)).toEqual(existing.puzzles);
+  });
+
+  test("leaves the batch unchanged when the new start date is not earlier", async () => {
+    const same = await prependDays(existing, "2026-12-01", { random: seededRandom(1), fetchPuzzle: good, ...noWait });
+    const later = await prependDays(existing, "2026-12-05", { random: seededRandom(1), fetchPuzzle: good, ...noWait });
+    expect(same).toEqual(existing);
+    expect(later).toEqual(existing);
+  });
+
+  test("does not mutate the batch it was given", async () => {
+    const copy = structuredClone(existing);
+    await prependDays(existing, "2026-11-20", { random: seededRandom(1), fetchPuzzle: good, ...noWait });
+    expect(existing).toEqual(copy);
+  });
+
+  test("never creates three of a kind across the join", async () => {
+    const hardStart = { ...existing, puzzles: [{ ...existing.puzzles[1]! }, { ...existing.puzzles[1]! }] };
+    for (let seed = 1; seed <= 100; seed++) {
+      const b = await prependDays(hardStart, "2026-11-29", { random: seededRandom(seed), fetchPuzzle: good, ...noWait });
+      expect(b.puzzles.slice(0, 3).map((p) => p.difficulty)).not.toEqual(["hard", "hard", "hard"]);
+    }
+  });
+
+  test("rejects a bad start date", async () => {
+    await expect(
+      prependDays(existing, "20/11/2026", { random: seededRandom(1), fetchPuzzle: good, ...noWait }),
+    ).rejects.toThrow(/start date/i);
   });
 });

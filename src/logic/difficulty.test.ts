@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { buildDifficultySchedule, seededRandom } from "./difficulty";
+import { buildDifficultySchedule, buildDifficultyScheduleBefore, seededRandom } from "./difficulty";
 
 describe("buildDifficultySchedule", () => {
   test("returns one difficulty per day", () => {
@@ -31,5 +31,33 @@ describe("buildDifficultySchedule", () => {
     const a = buildDifficultySchedule(50, seededRandom(7));
     expect(buildDifficultySchedule(50, seededRandom(7))).toEqual(a);
     expect(buildDifficultySchedule(50, seededRandom(8))).not.toEqual(a);
+  });
+});
+
+describe("buildDifficultyScheduleBefore", () => {
+  test("returns the requested number of days", () => {
+    expect(buildDifficultyScheduleBefore(["easy", "hard"], 11, seededRandom(1))).toHaveLength(11);
+  });
+
+  test("never makes three in a row where the new days join the existing ones", () => {
+    const existing = ["hard", "hard", "easy", "medium"] as const;
+    for (let seed = 1; seed <= 300; seed++) {
+      const joined = [...buildDifficultyScheduleBefore(existing, 11, seededRandom(seed)), ...existing];
+      for (let i = 2; i < joined.length; i++) {
+        const threeSame = joined[i] === joined[i - 1] && joined[i] === joined[i - 2];
+        expect(threeSame, `seed ${seed}, day ${i}`).toBe(false);
+      }
+    }
+  });
+
+  test("avoids a third hard when the existing days start with two hards", () => {
+    for (let seed = 1; seed <= 300; seed++) {
+      const before = buildDifficultyScheduleBefore(["hard", "hard"], 1, seededRandom(seed));
+      expect(before).not.toEqual(["hard"]);
+    }
+  });
+
+  test("zero days is an empty list", () => {
+    expect(buildDifficultyScheduleBefore(["easy"], 0, seededRandom(1))).toEqual([]);
   });
 });

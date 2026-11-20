@@ -13,7 +13,8 @@
     "puzzles": "tsx scripts/fetch-puzzles.ts",
     "tokens": "tsx scripts/make-tokens.ts",
     "sample": "tsx scripts/make-sample.ts",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "puzzles:prepend": "tsx scripts/prepend-puzzles.ts"
   },
   "dependencies": {
     "preact": "^11.2.0"
